@@ -11,13 +11,12 @@ interface BaseEntity {
 
 data class Customer(
         override val id: Int? = null,
-        val balance: Double,
-        val services: MutableList<Service>
+        val balance: Double = 0.0
 ) : BaseEntity
 
 data class Service(
         override val id: Int? = null,
-        val price: Double = 0.0
+        val price: Double
 ) : BaseEntity
 
 

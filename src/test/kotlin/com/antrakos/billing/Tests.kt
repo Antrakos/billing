@@ -1,6 +1,8 @@
 package com.antrakos.billing
 
+import com.antrakos.billing.models.Customer
 import com.antrakos.billing.models.Service
+import com.antrakos.billing.repository.CustomerRepository
 import com.antrakos.billing.repository.ServiceRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,7 +16,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
  */
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class SpringTest(@Autowired private val serviceRepository: ServiceRepository){
+class SpringTest(
+        @Autowired private val serviceRepository: ServiceRepository,
+        @Autowired private val customerRepository: CustomerRepository) {
 
     @BeforeEach
     fun setup() {
@@ -28,6 +32,13 @@ class SpringTest(@Autowired private val serviceRepository: ServiceRepository){
         sequenceOf(Service(1, 20.0), Service(2, 10.0), Service(3, 100.0), Service(4, 8.0)).map { serviceRepository.save(it) }.forEach(::println)
         println("Delete")
         (1..4).forEach { serviceRepository.deleteById(it) }
+
+        println("Create")
+        sequenceOf(Customer(balance = 20.0), Customer(balance = 10.0), Customer(balance = 100.0), Customer(balance = 8.0)).map { customerRepository.save(it) }.forEach(::println)
+        println("Update")
+        sequenceOf(Customer(1, 20.0), Customer(2, 10.0), Customer(3, 100.0), Customer(4, 8.0)).map { customerRepository.save(it) }.forEach(::println)
+        println("Delete")
+        (1..4).forEach { customerRepository.deleteById(it) }
     }
 
 }
