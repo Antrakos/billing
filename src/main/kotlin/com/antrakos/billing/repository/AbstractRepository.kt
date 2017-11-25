@@ -1,7 +1,6 @@
-package com.antrakos.billing.service
+package com.antrakos.billing.repository
 
 import com.antrakos.billing.models.BaseEntity
-import com.antrakos.billing.repository.CrudRepository
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
@@ -13,7 +12,7 @@ import java.sql.ResultSet
  */
 abstract class AbstractRepository<T : BaseEntity>(
         protected val jdbcTemplate: JdbcTemplate,
-        private val tableName: String,
+        protected val tableName: String,
         private val insert: SimpleJdbcInsert = SimpleJdbcInsert(jdbcTemplate).withTableName(tableName).usingGeneratedKeyColumns("id")) : CrudRepository<T, Int> {
 
     abstract fun fromResultSet(resultSet: ResultSet): T

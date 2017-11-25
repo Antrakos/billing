@@ -1,9 +1,6 @@
 package com.antrakos.billing.repository
 
-import com.antrakos.billing.models.Bill
-import com.antrakos.billing.models.Customer
-import com.antrakos.billing.models.Service
-import com.antrakos.billing.models.Usage
+import com.antrakos.billing.models.*
 
 /**
  * @author Taras Zubrei
@@ -20,3 +17,6 @@ interface CustomerRepository: CrudRepository<Customer, Int>
 interface ServiceRepository: CrudRepository<Service, Int>
 interface UsageRepository: CrudRepository<Usage, Int>
 interface BillRepository: CrudRepository<Bill, Int>
+interface CustomerToServiceMappingRepository: CrudRepository<CustomerToServiceMapping, Int> {
+    fun exists(serviceId: Int, customerId: Int): Int?
+}

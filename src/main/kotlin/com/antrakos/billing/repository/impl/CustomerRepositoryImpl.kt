@@ -1,8 +1,8 @@
-package com.antrakos.billing.service.impl
+package com.antrakos.billing.repository.impl
 
 import com.antrakos.billing.models.Customer
 import com.antrakos.billing.repository.CustomerRepository
-import com.antrakos.billing.service.AbstractRepository
+import com.antrakos.billing.repository.AbstractRepository
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet

@@ -32,8 +32,16 @@ data class Usage(
 data class Bill(
         override val id: Int? = null,
         val date: LocalDate,
+        val amount: Double,
         val customer: Customer,
         val service: Service
+) : BaseEntity
+
+
+data class CustomerToServiceMapping(
+        override val id: Int? = null,
+        val customerId: Int,
+        val serviceId: Int
 ) : BaseEntity
 
 
