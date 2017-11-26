@@ -1,6 +1,7 @@
 package com.antrakos.billing.repository
 
 import com.antrakos.billing.models.*
+import java.time.LocalDate
 
 /**
  * @author Taras Zubrei
@@ -14,9 +15,19 @@ interface CrudRepository<T, in ID> {
 }
 
 interface CustomerRepository: CrudRepository<Customer, Int>
-interface ServiceRepository: CrudRepository<Service, Int>
-interface UsageRepository: CrudRepository<Usage, Int>
-interface BillRepository: CrudRepository<Bill, Int>
+interface ServiceRepository: CrudRepository<Service, Int> {
+    fun findAllEnabled(): List<Service>
+}
+interface UsageRepository: CrudRepository<Usage, Int> {
+    fun find(serviceId: Int, customerId: Int, after: LocalDate): List<Usage>
+    fun find(serviceId: Int, customerId: Int): List<Usage>
+    fun findLastPaid(serviceId: Int, customerId: Int, date: LocalDate): Usage?
+}
+interface BillRepository: CrudRepository<Bill, Int> {
+    fun findLast(serviceId: Int, customerId: Int): Bill?
+}
 interface CustomerToServiceMappingRepository: CrudRepository<CustomerToServiceMapping, Int> {
     fun exists(serviceId: Int, customerId: Int): Int?
+    fun findServices(customerId: Int): List<Service>
+    fun findCustomers(serviceId: Int): List<Customer>
 }

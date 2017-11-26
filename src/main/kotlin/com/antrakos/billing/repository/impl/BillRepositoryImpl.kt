@@ -3,7 +3,9 @@ package com.antrakos.billing.repository.impl
 import com.antrakos.billing.models.Bill
 import com.antrakos.billing.models.CustomerToServiceMapping
 import com.antrakos.billing.repository.*
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import java.sql.Date
 import java.sql.ResultSet
@@ -12,14 +14,28 @@ import java.sql.ResultSet
  * @author Taras Zubrei
  */
 @Repository
-open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRepository: CustomerRepository, private val serviceRepository: ServiceRepository, private val customerToServiceMappingRepository: CustomerToServiceMappingRepository):
+open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRepository: CustomerRepository, private val serviceRepository: ServiceRepository, private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) :
         AbstractRepository<Bill>(jdbcTemplate, "bills"), BillRepository {
+    override fun findLast(serviceId: Int, customerId: Int): Bill? {
+        val id = customerToServiceMappingRepository.exists(serviceId, customerId) ?: throw IllegalStateException("No recorded usages for customer[id=$customerId] and service[id=$serviceId]")
+        return try {
+            jdbcTemplate.queryForObject("SELECT * FROM $tableName WHERE customer_service_id=? ORDER BY id DESC LIMIT 1;", RowMapper { rs, _ -> fromResultSet(rs, serviceId, customerId) }, id)
+        } catch (ex: EmptyResultDataAccessException) {
+            null
+        }
+    }
+
     override fun fromResultSet(resultSet: ResultSet): Bill {
         val (_, customerId, serviceId) = customerToServiceMappingRepository.findById(resultSet.getInt("customer_service_id"))!!
+        return fromResultSet(resultSet, serviceId, customerId)
+    }
+
+    private fun fromResultSet(resultSet: ResultSet, serviceId: Int, customerId: Int): Bill {
         return Bill(
                 id = resultSet.getInt("id"),
                 date = resultSet.getDate("date").toLocalDate(),
                 amount = resultSet.getDouble("amount"),
+                paid = resultSet.getBoolean("paid"),
                 customer = customerRepository.findById(customerId)!!,
                 service = serviceRepository.findById(serviceId)!!
         )
@@ -30,6 +46,7 @@ open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRe
         return mapOf(
                 "date" to Date.valueOf(entity.date),
                 "amount" to entity.amount,
+                "paid" to entity.paid,
                 "customer_service_id" to id
         )
     }

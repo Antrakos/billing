@@ -8,6 +8,7 @@ CREATE TABLE "customers" (
 CREATE TABLE "services" (
 	"id" serial NOT NULL,
 	"price" FLOAT NOT NULL,
+	"enabled" BOOLEAN NOT NULL DEFAULT TRUE,
 	CONSTRAINT services_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -34,6 +35,7 @@ CREATE TABLE "bills" (
 	"date" DATE NOT NULL,
 	"amount" FLOAT NOT NULL,
 	"customer_service_id" integer NOT NULL,
+	"paid" BOOLEAN NOT NULL DEFAULT FALSE,
 	CONSTRAINT bills_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

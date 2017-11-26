@@ -16,6 +16,7 @@ data class Customer(
 
 data class Service(
         override val id: Int? = null,
+        val enabled: Boolean = true,
         val price: Double
 ) : BaseEntity
 
@@ -34,7 +35,8 @@ data class Bill(
         val date: LocalDate,
         val amount: Double,
         val customer: Customer,
-        val service: Service
+        val service: Service,
+        val paid: Boolean = false
 ) : BaseEntity
 
 
@@ -45,4 +47,4 @@ data class CustomerToServiceMapping(
 ) : BaseEntity
 
 
-data class UsageReport(val lastPaid: Usage, val indexes: List<Usage>)
+data class UsageReport(val lastPaid: Usage? = null, val indexes: List<Usage>)
