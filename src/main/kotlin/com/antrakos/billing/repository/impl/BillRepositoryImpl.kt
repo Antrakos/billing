@@ -6,6 +6,7 @@ import com.antrakos.billing.repository.*
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
+import org.springframework.jdbc.core.query
 import org.springframework.stereotype.Repository
 import java.sql.Date
 import java.sql.ResultSet
@@ -16,6 +17,11 @@ import java.sql.ResultSet
 @Repository
 open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRepository: CustomerRepository, private val serviceRepository: ServiceRepository, private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) :
         AbstractRepository<Bill>(jdbcTemplate, "bills"), BillRepository {
+    override fun find(serviceId: Int, customerId: Int): List<Bill> {
+        val id = customerToServiceMappingRepository.exists(serviceId, customerId) ?: throw IllegalStateException("No recorded usages for customer[id=$customerId] and service[id=$serviceId]")
+        return jdbcTemplate.query("SELECT * FROM $tableName WHERE customer_service_id=?;", id) { rs, _ -> fromResultSet(rs, serviceId, customerId) }
+    }
+
     override fun findLast(serviceId: Int, customerId: Int): Bill? {
         val id = customerToServiceMappingRepository.exists(serviceId, customerId) ?: throw IllegalStateException("No recorded usages for customer[id=$customerId] and service[id=$serviceId]")
         return try {

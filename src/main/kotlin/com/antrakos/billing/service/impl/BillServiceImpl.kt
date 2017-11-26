@@ -4,6 +4,7 @@ import com.antrakos.billing.models.Bill
 import com.antrakos.billing.models.Customer
 import com.antrakos.billing.models.Service
 import com.antrakos.billing.repository.BillRepository
+import com.antrakos.billing.repository.CustomerToServiceMappingRepository
 import com.antrakos.billing.service.BillService
 import com.antrakos.billing.service.UsageService
 
@@ -11,7 +12,15 @@ import com.antrakos.billing.service.UsageService
  * @author Taras Zubrei
  */
 @org.springframework.stereotype.Service
-open class BillServiceImpl(private val repository: BillRepository, private val usageService: UsageService) : BillService {
+open class BillServiceImpl(
+        private val repository: BillRepository,
+        private val usageService: UsageService,
+        private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) : BillService {
+
+    override fun find(customer: Customer): List<Bill> {
+        return customerToServiceMappingRepository.findServices(customer.id!!).flatMap { repository.find(it.id!!, customer.id) }
+    }
+
     override fun lastBillDate(customer: Customer, service: Service) =
             repository.findLast(service.id!!, customer.id!!)?.date
 

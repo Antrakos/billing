@@ -20,6 +20,8 @@ open class CustomerServiceImpl(
         private val usageService: UsageService,
         private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) : CustomerService {
 
+    override fun findServices(customer: Customer) = customerToServiceMappingRepository.findServices(customer.id!!)
+
     override fun addService(customer: Customer, service: Service) {
         if (customerToServiceMappingRepository.exists(serviceId = service.id!!, customerId = customer.id!!) != null)
             throw IllegalStateException("Customer[id=${customer.id}] has already activated service[id=${service.id}]")

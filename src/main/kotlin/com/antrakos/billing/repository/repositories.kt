@@ -24,6 +24,7 @@ interface UsageRepository: CrudRepository<Usage, Int> {
     fun findLastPaid(serviceId: Int, customerId: Int, date: LocalDate): Usage?
 }
 interface BillRepository: CrudRepository<Bill, Int> {
+    fun find(serviceId: Int, customerId: Int): List<Bill>
     fun findLast(serviceId: Int, customerId: Int): Bill?
 }
 interface CustomerToServiceMappingRepository: CrudRepository<CustomerToServiceMapping, Int> {
