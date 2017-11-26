@@ -14,6 +14,8 @@ import java.time.LocalDate
  */
 @org.springframework.stereotype.Service
 open class UsageServiceImpl(private val repository: UsageRepository, private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) : UsageService {
+    override fun find(customer: Customer, service: Service) = repository.find(service.id!!, customer.id!!)
+
     override fun getUsageReport(customer: Customer, service: Service, lastPaid: LocalDate?) = if (lastPaid != null) UsageReport(
             lastPaid = repository.findLastPaid(service.id!!, customer.id!!, lastPaid),
             indexes = repository.find(service.id, customer.id, lastPaid)

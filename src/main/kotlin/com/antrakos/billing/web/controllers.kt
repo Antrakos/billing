@@ -8,13 +8,13 @@ import com.antrakos.billing.service.CustomerService
 import com.antrakos.billing.service.ServiceService
 import com.antrakos.billing.service.UsageService
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
 /**
  * @author Taras Zubrei
  */
-@RestController("/customer/")
+@RestController
+@RequestMapping("/customer/")
 open class CustomerController(
         private val customerService: CustomerService,
         private val billService: BillService,
@@ -28,7 +28,7 @@ open class CustomerController(
     @RequestMapping(method = arrayOf(RequestMethod.GET), value = "{id}")
     fun find(@PathVariable("id") id: Int) = map(customerService.find(id))
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST), value = "{id}/service/{serviceId}")
+    @RequestMapping(method = arrayOf(RequestMethod.PUT), value = "{id}/service/{serviceId}")
     @ResponseStatus(HttpStatus.CREATED)
     fun addService(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int) {
         customerService.addService(customerService.find(id), serviceService.find(serviceId))
@@ -48,7 +48,7 @@ open class CustomerController(
                         )
                     }
 
-    @RequestMapping(method = arrayOf(RequestMethod.DELETE), value = "{id}/service/{serviceId}", consumes = arrayOf(MediaType.TEXT_PLAIN_VALUE))
+    @RequestMapping(method = arrayOf(RequestMethod.DELETE), value = "{id}/service/{serviceId}")
     fun stopService(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int, @RequestBody lastUsageValue: Double) {
         val service = serviceService.find(serviceId)
         val customer = customerService.find(id)
@@ -63,7 +63,8 @@ open class CustomerController(
     )
 }
 
-@RestController("/service/")
+@RestController
+@RequestMapping("/service/")
 open class ServiceController(private val serviceService: ServiceService) {
     @RequestMapping(method = arrayOf(RequestMethod.GET))
     fun findAll() = serviceService.findAllEnabled()
@@ -76,7 +77,8 @@ open class ServiceController(private val serviceService: ServiceService) {
     fun disable(@PathVariable("id") id: Int) = serviceService.disable(serviceService.find(id))
 }
 
-@RestController("/usage/")
+@RestController
+@RequestMapping("/usage/")
 open class UsageController(
         private val customerService: CustomerService,
         private val usageService: UsageService,

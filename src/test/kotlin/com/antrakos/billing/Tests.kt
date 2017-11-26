@@ -5,18 +5,17 @@ import com.antrakos.billing.models.Customer
 import com.antrakos.billing.models.Service
 import com.antrakos.billing.models.Usage
 import com.antrakos.billing.repository.*
-import com.antrakos.billing.service.BillService
-import com.antrakos.billing.service.CustomerService
-import com.antrakos.billing.service.ServiceService
-import com.antrakos.billing.service.UsageService
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.antrakos.billing.service.BillGenerator
+import com.antrakos.billing.web.CustomerDTO
+import com.antrakos.billing.web.UsageRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpMethod
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 
@@ -31,10 +30,8 @@ class SpringTest(
         @Autowired private val billRepository: BillRepository,
         @Autowired private val customerToServiceMappingRepository: CustomerToServiceMappingRepository,
         @Autowired private val customerRepository: CustomerRepository,
-        @Autowired private val billService: BillService,
-        @Autowired private val usageService: UsageService,
-        @Autowired private val customerService: CustomerService,
-        @Autowired private val serviceService: ServiceService) {
+        @Autowired private val billGenerator: BillGenerator,
+        @Autowired private val restTemplate: TestRestTemplate) {
 
     @BeforeEach
     fun setup() {
@@ -42,128 +39,123 @@ class SpringTest(
 
     @Test
     fun generatingBills() {
-        val service = serviceService.create(Service(enabled = true, price = 100.0))
-        val customer = customerService.create(Customer())
-        customerService.addService(customer, service)
+        val customerResponse = restTemplate.postForObject("/customer/", Customer(), CustomerDTO::class.java)
+        val serviceResponse = restTemplate.postForObject("/service/", Service(price = 100.0), Service::class.java)
+        val service = serviceResponse.id!!
+        val customer = customerResponse.id
+        restTemplate.put("/customer/$customer/service/$service", null)
         sequenceOf(
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 1, 1),
                         value = 0.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 1, 11),
                         value = 5.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 1, 21),
                         value = 8.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 1, 30),
                         value = 10.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 2, 8),
                         value = 13.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 2, 25),
                         value = 18.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 3, 2),
                         value = 21.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 3, 14),
                         value = 27.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 3, 29),
                         value = 30.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 4, 12),
                         value = 35.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 )
-        ).forEach { usageService.create(it) }
-        println(ObjectMapper().registerModules(JavaTimeModule(), KotlinModule()).writerWithDefaultPrettyPrinter().writeValueAsString(
-                billService.createBill(customer, service)
-        ))
+        ).forEach { restTemplate.postForEntity("/usage/", it, Usage::class.java) }
+
+        billGenerator.generateBills()
 
         sequenceOf(
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 4, 25),
                         value = 39.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 5, 1),
                         value = 42.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 5, 10),
                         value = 45.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 5, 20),
                         value = 47.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 5, 30),
                         value = 50.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 6, 11),
                         value = 55.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 ),
-                Usage(
+                UsageRequest(
                         date = LocalDate.of(2017, 7, 1),
                         value = 65.0,
-                        service = service,
-                        customer = customer
+                        serviceId = service,
+                        customerId = customer
                 )
-        ).forEach { usageService.create(it) }
-        println(ObjectMapper().registerModules(JavaTimeModule(), KotlinModule()).writerWithDefaultPrettyPrinter().writeValueAsString(
-                billService.createBill(customer, service)
-        ))
-        customerService.stopService(customer, service, Usage(
-                date = LocalDate.now(),
-                value = 180.0,
-                service = service,
-                customer = customer
-        ))
+        ).forEach { restTemplate.postForEntity("/usage/", it, Usage::class.java) }
+
+        billGenerator.generateBills()
+        restTemplate.exchange("/customer/$customer/service/$service", HttpMethod.DELETE, HttpEntity(180.0), String::class.java)
     }
 
     @Test
