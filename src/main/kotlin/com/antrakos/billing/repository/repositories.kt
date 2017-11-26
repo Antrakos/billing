@@ -28,6 +28,7 @@ interface BillRepository: CrudRepository<Bill, Int> {
     fun findLast(serviceId: Int, customerId: Int): Bill?
 }
 interface CustomerToServiceMappingRepository: CrudRepository<CustomerToServiceMapping, Int> {
+    fun findActive(): List<CustomerToServiceMapping>
     fun find(serviceId: Int, customerId: Int): CustomerToServiceMapping
     fun exists(serviceId: Int, customerId: Int): Int?
     fun findServices(customerId: Int): List<Service>

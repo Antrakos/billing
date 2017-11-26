@@ -7,6 +7,7 @@ import com.antrakos.billing.repository.CustomerToServiceMappingRepository
 import com.antrakos.billing.repository.ServiceRepository
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.query
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
@@ -17,6 +18,9 @@ import java.sql.ResultSet
 @Repository
 open class CustomerToServiceMappingRepositoryImpl(jdbcTemplate: JdbcTemplate, private val serviceRepository: ServiceRepository, private val customerRepository: CustomerRepository) :
         AbstractRepository<CustomerToServiceMapping>(jdbcTemplate, "customers_services_mapping"), CustomerToServiceMappingRepository {
+
+    override fun findActive() = jdbcTemplate.query("SELECT * FROM $tableName WHERE active=?", true) { rs, _ -> fromResultSet(rs) }
+
     override fun find(serviceId: Int, customerId: Int) = try {
         jdbcTemplate.queryForObject("SELECT * FROM $tableName WHERE service_id=? AND customer_id=?", serviceId, customerId) { rs, _ -> fromResultSet(rs) }!!
     } catch (ex: EmptyResultDataAccessException) {
