@@ -44,6 +44,7 @@ class SpringTest(
     fun generatingBills() {
         val service = serviceService.create(Service(enabled = true, price = 100.0))
         val customer = customerService.create(Customer())
+        customerService.addService(customer, service)
         sequenceOf(
                 Usage(
                         date = LocalDate.of(2017, 1, 1),
@@ -156,6 +157,12 @@ class SpringTest(
         ).forEach { usageService.create(it) }
         println(ObjectMapper().registerModules(JavaTimeModule(), KotlinModule()).writerWithDefaultPrettyPrinter().writeValueAsString(
                 billService.createBill(customer, service)
+        ))
+        customerService.stopService(customer, service, Usage(
+                date = LocalDate.now(),
+                value = 180.0,
+                service = service,
+                customer = customer
         ))
     }
 

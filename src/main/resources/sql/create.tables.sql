@@ -17,6 +17,7 @@ CREATE TABLE "customers_services_mapping" (
 	"id" serial NOT NULL,
 	"customer_id" integer NOT NULL,
 	"service_id" integer NOT NULL,
+	"active" BOOLEAN NOT NULL DEFAULT TRUE,
 	CONSTRAINT customers_services_mapping_pk PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE

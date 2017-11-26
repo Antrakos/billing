@@ -43,7 +43,8 @@ data class Bill(
 data class CustomerToServiceMapping(
         override val id: Int? = null,
         val customerId: Int,
-        val serviceId: Int
+        val serviceId: Int,
+        val active: Boolean = true
 ) : BaseEntity
 
 

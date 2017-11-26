@@ -22,7 +22,7 @@ open class BillServiceImpl(private val repository: BillRepository, private val u
 
         keys.forEachIndexed { index, localDate ->
             if (index + 1 >= keys.size) return@forEachIndexed
-            monthlyUsages.put(localDate, monthlyUsages[localDate]!!.plus(monthlyUsages[keys[index+1]]!!.first()))
+            monthlyUsages.put(localDate, monthlyUsages[localDate]!!.plus(monthlyUsages[keys[index + 1]]!!.first()))
         }
         if (lastPaid != null && monthlyUsages.isNotEmpty()) {
             val firstEntry = monthlyUsages.entries.first()

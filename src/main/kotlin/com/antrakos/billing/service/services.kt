@@ -26,6 +26,6 @@ interface ServiceService {
 interface CustomerService {
     fun create(customer: Customer): Customer
     fun find(id: Int): Customer
-//    fun addService(service: Service)
-//    fun stopService(service: Service)
+    fun addService(customer: Customer, service: Service)
+    fun stopService(customer: Customer, service: Service, lastUsage: Usage)
 }
