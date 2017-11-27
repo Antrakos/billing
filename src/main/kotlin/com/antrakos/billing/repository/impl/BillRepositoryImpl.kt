@@ -5,8 +5,8 @@ import com.antrakos.billing.models.CustomerToServiceMapping
 import com.antrakos.billing.repository.*
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.query
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.Date
 import java.sql.ResultSet
@@ -25,7 +25,7 @@ open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRe
     override fun findLast(serviceId: Int, customerId: Int): Bill? {
         val id = customerToServiceMappingRepository.exists(serviceId, customerId) ?: throw IllegalStateException("No recorded usages for customer[id=$customerId] and service[id=$serviceId]")
         return try {
-            jdbcTemplate.queryForObject("SELECT * FROM $tableName WHERE customer_service_id=? ORDER BY id DESC LIMIT 1;", RowMapper { rs, _ -> fromResultSet(rs, serviceId, customerId) }, id)
+            jdbcTemplate.queryForObject("SELECT * FROM $tableName WHERE customer_service_id=? ORDER BY id DESC LIMIT 1;", id) { rs, _ -> fromResultSet(rs, serviceId, customerId) }
         } catch (ex: EmptyResultDataAccessException) {
             null
         }
