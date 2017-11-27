@@ -15,6 +15,9 @@ interface CrudRepository<T, in ID> {
 }
 
 interface CustomerRepository: CrudRepository<Customer, Int>
+interface UserRepository: CrudRepository<User, Int> {
+    fun findByUsername(username: String): User?
+}
 interface ServiceRepository: CrudRepository<Service, Int> {
     fun findAllEnabled(): List<Service>
 }

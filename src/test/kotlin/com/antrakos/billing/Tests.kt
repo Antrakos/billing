@@ -1,9 +1,6 @@
 package com.antrakos.billing
 
-import com.antrakos.billing.models.Bill
-import com.antrakos.billing.models.Customer
-import com.antrakos.billing.models.Service
-import com.antrakos.billing.models.Usage
+import com.antrakos.billing.models.*
 import com.antrakos.billing.repository.*
 import com.antrakos.billing.service.BillGenerator
 import com.antrakos.billing.web.CustomerDTO
@@ -16,7 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.web.client.MockRestServiceServer
+import org.springframework.test.web.client.match.MockRestRequestMatchers.method
+import org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo
+import org.springframework.test.web.client.response.MockRestResponseCreators.withStatus
 import java.time.LocalDate
 
 /**
@@ -28,6 +31,8 @@ class SpringTest(
         @Autowired private val serviceRepository: ServiceRepository,
         @Autowired private val usageRepository: UsageRepository,
         @Autowired private val billRepository: BillRepository,
+        @Autowired private val userRepository: UserRepository,
+        @Autowired private val passwordEncoder: PasswordEncoder,
         @Autowired private val customerToServiceMappingRepository: CustomerToServiceMappingRepository,
         @Autowired private val customerRepository: CustomerRepository,
         @Autowired private val billGenerator: BillGenerator,
@@ -35,6 +40,21 @@ class SpringTest(
 
     @BeforeEach
     fun setup() {
+    }
+
+    @Test
+    fun security() {
+        val user = userRepository.save(User(
+                username = "admin",
+                password = passwordEncoder.encode("admin"),
+                enabled = true,
+                role = Role.WORKER
+        ))
+        val restTemplate = TestRestTemplate("admin", "admin")
+        val server = MockRestServiceServer.createServer(restTemplate.restTemplate)
+        server.expect(requestTo("/customer/")).andExpect(method(HttpMethod.POST)).andRespond(withStatus(HttpStatus.OK))
+        restTemplate.postForObject("/customer/", Customer(), CustomerDTO::class.java)
+        server.verify()
     }
 
     @Test

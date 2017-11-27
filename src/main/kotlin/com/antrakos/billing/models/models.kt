@@ -9,6 +9,18 @@ interface BaseEntity {
     val id: Int?
 }
 
+enum class Role {
+    WORKER, CUSTOMER
+}
+
+data class User (
+        override val id: Int? = null,
+        val username: String,
+        val password: String,
+        val role: Role,
+        val enabled: Boolean
+) : BaseEntity
+
 data class Customer(
         override val id: Int? = null,
         val balance: Double = 0.0
