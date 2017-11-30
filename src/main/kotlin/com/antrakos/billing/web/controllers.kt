@@ -1,14 +1,12 @@
 package com.antrakos.billing.web
 
-import com.antrakos.billing.models.Customer
-import com.antrakos.billing.models.Service
-import com.antrakos.billing.models.Usage
-import com.antrakos.billing.service.BillService
-import com.antrakos.billing.service.CustomerService
-import com.antrakos.billing.service.ServiceService
-import com.antrakos.billing.service.UsageService
+import com.antrakos.billing.models.*
+import com.antrakos.billing.service.*
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import javax.annotation.security.PermitAll
 
 /**
  * @author Taras Zubrei
@@ -19,36 +17,50 @@ open class CustomerController(
         private val customerService: CustomerService,
         private val billService: BillService,
         private val usageService: UsageService,
+        private val userService: UserService,
         private val serviceService: ServiceService) {
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST))
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody customer: Customer) = map(customerService.create(customer))
+    fun create(@RequestBody customerRequest: CustomerRequest): CustomerDTO {
+        val customer = customerService.create(Customer())
+        userService.create(customerRequest.let {
+            User(
+                    username = it.username,
+                    password = it.password,
+                    role = Role.CUSTOMER,
+                    enabled = true,
+                    customerId = customer.id
+            )
+        })
+        return map(customer)
+    }
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "{id}")
-    fun find(@PathVariable("id") id: Int) = map(customerService.find(id))
+    @GetMapping("{id}")
+    fun find(@PathVariable("id") id: Int, @AuthenticationPrincipal user: SecureUser) = user.checkAccess(id).let { map(customerService.find(id)) }
 
-    @RequestMapping(method = arrayOf(RequestMethod.PUT), value = "{id}/service/{serviceId}")
+    @PutMapping("{id}/service/{serviceId}")
     @ResponseStatus(HttpStatus.CREATED)
-    fun addService(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int) {
+    fun addService(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int, @AuthenticationPrincipal user: SecureUser) = user.checkAccess(id).let {
         customerService.addService(customerService.find(id), serviceService.find(serviceId))
     }
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "{id}/service/")
-    fun findServices(@PathVariable("id") id: Int) = customerService.findServices(customerService.find(id))
+    @GetMapping("{id}/service/")
+    fun findServices(@PathVariable("id") id: Int, @AuthenticationPrincipal user: SecureUser) = user.checkAccess(id).let { customerService.findServices(customerService.find(id)) }
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET), value = "{id}/service/{serviceId}/usage")
-    fun findUsages(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int) =
-            usageService.find(customerService.find(id), serviceService.find(serviceId))
-                    .map {
-                        UsageDTO(
-                                id = it.id!!,
-                                value = it.value,
-                                date = it.date
-                        )
-                    }
+    @GetMapping("{id}/service/{serviceId}/usage")
+    fun findUsages(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int, @AuthenticationPrincipal user: SecureUser) = user.checkAccess(id).let {
+        usageService.find(customerService.find(id), serviceService.find(serviceId))
+                .map {
+                    UsageDTO(
+                            id = it.id!!,
+                            value = it.value,
+                            date = it.date
+                    )
+                }
+    }
 
-    @RequestMapping(method = arrayOf(RequestMethod.DELETE), value = "{id}/service/{serviceId}")
+    @DeleteMapping("{id}/service/{serviceId}")
     fun stopService(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int, @RequestBody lastUsageValue: Double) {
         val service = serviceService.find(serviceId)
         val customer = customerService.find(id)
@@ -66,14 +78,14 @@ open class CustomerController(
 @RestController
 @RequestMapping("/service/")
 open class ServiceController(private val serviceService: ServiceService) {
-    @RequestMapping(method = arrayOf(RequestMethod.GET))
+    @GetMapping
     fun findAll() = serviceService.findAllEnabled()
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST))
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody service: Service) = serviceService.create(service)
 
-    @RequestMapping(method = arrayOf(RequestMethod.DELETE), value = "{id}")
+    @DeleteMapping("{id}")
     fun disable(@PathVariable("id") id: Int) = serviceService.disable(serviceService.find(id))
 }
 
@@ -84,7 +96,7 @@ open class UsageController(
         private val usageService: UsageService,
         private val serviceService: ServiceService) {
 
-    @RequestMapping(method = arrayOf(RequestMethod.POST))
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody usage: UsageRequest) = usageService.create(
             Usage(
