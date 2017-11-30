@@ -4,4 +4,5 @@
 build/
 .idea/
 out/
+tmp/
 .idea_modules/
