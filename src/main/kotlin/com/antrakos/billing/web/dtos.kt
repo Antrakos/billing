@@ -13,6 +13,11 @@ data class CustomerDTO(
         val unpaidBills: List<BillDTO>
 )
 
+data class CustomerRequest(
+        val username: String,
+        val password: String
+)
+
 
 data class UsageDTO(
         val id: Int,

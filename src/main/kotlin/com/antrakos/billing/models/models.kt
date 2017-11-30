@@ -18,7 +18,8 @@ data class User (
         val username: String,
         val password: String,
         val role: Role,
-        val enabled: Boolean
+        val enabled: Boolean,
+        val customerId: Int? = null
 ) : BaseEntity
 
 data class Customer(

@@ -28,11 +28,11 @@ open class CustomerToServiceMappingRepositoryImpl(jdbcTemplate: JdbcTemplate, pr
     }
 
     override fun findServices(customerId: Int) =
-            jdbcTemplate.queryForList("SELECT id FROM $tableName WHERE customer_id=?", Int::class.java, customerId)
+            jdbcTemplate.queryForList("SELECT service_id FROM $tableName WHERE customer_id=?", Int::class.java, customerId)
                     .map { serviceRepository.findById(it)!! }
 
     override fun findCustomers(serviceId: Int) =
-            jdbcTemplate.queryForList("SELECT id FROM $tableName WHERE service_id=?", Int::class.java, serviceId)
+            jdbcTemplate.queryForList("SELECT customer_id FROM $tableName WHERE service_id=?", Int::class.java, serviceId)
                     .map { customerRepository.findById(it)!! }
 
     override fun exists(serviceId: Int, customerId: Int) = try {

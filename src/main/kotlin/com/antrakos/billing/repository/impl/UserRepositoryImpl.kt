@@ -26,13 +26,14 @@ open class UserRepositoryImpl(jdbcTemplate: JdbcTemplate) : AbstractRepository<U
             username = resultSet.getString("username"),
             password = resultSet.getString("password"),
             role = Role.valueOf(resultSet.getString("role")),
-            enabled = resultSet.getBoolean("enabled")
+            enabled = resultSet.getBoolean("enabled"),
+            customerId = resultSet.getObject("customer_id", Integer::class.java)?.toInt()
     )
 
-    override fun toFields(entity: User) = mapOf(
+    override fun toFields(entity: User) = mutableMapOf(
             "username" to entity.username,
             "password" to entity.password,
             "role" to entity.role.name,
             "enabled" to entity.enabled
-    )
+    ).apply { if (entity.customerId != null) put("customer_id", entity.customerId) }
 }

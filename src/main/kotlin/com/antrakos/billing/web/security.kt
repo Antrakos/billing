@@ -1,21 +1,21 @@
 package com.antrakos.billing.web
 
+import com.antrakos.billing.models.Role
 import com.antrakos.billing.repository.UserRepository
+import com.antrakos.billing.service.impl.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.stereotype.Service
 import javax.servlet.http.HttpServletResponse
 
 /**
@@ -28,6 +28,11 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
         http
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/customer/").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/customer/**/service/**").hasRole(Role.WORKER.name)
+                .antMatchers(HttpMethod.POST, "/service/").hasRole(Role.WORKER.name)
+                .antMatchers(HttpMethod.DELETE, "/service/**").hasRole(Role.WORKER.name)
+                .antMatchers(HttpMethod.POST, "/usage/").hasRole(Role.WORKER.name)
                 .anyRequest().authenticated()
                 .and().httpBasic()
                 .authenticationEntryPoint { _, response, authException ->
@@ -41,9 +46,9 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
     open fun passwordEncoder() = BCryptPasswordEncoder()
 
     @Bean
-    open fun authenticationProvider(userDetailsService: UserDetailsService, passwordEncoder: PasswordEncoder) = DaoAuthenticationProvider().apply {
-        setUserDetailsService(userDetailsService)
-        setPasswordEncoder(passwordEncoder)
+    open fun authenticationProvider(userRepository: UserRepository) = DaoAuthenticationProvider().apply {
+        setUserDetailsService(UserServiceImpl(userRepository, passwordEncoder()))
+        setPasswordEncoder(passwordEncoder())
     }
 
     @Autowired
@@ -54,14 +59,24 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
     }
 }
 
-@Service
-open class UserDetailsServiceImpl(private val userRepository: UserRepository) : UserDetailsService {
-    override fun loadUserByUsername(username: String) = userRepository.findByUsername(username)?.let {
-        User
-                .withUsername(it.username)
-                .password(it.password)
-                .roles(it.role.name)
-                .disabled(!it.enabled)
-                .build()
-    } ?: throw UsernameNotFoundException("No user found for username=$username")
+class SecureUser(val id: Int, private val username: String, private val password: String, private val role: Role, private val enabled: Boolean, private val customerId: Int?) : UserDetails {
+    override fun getAuthorities() = listOf(SimpleGrantedAuthority("ROLE_" + role))
+
+    override fun isEnabled() = enabled
+
+    override fun getUsername() = username
+
+    override fun isCredentialsNonExpired() = true
+
+    override fun getPassword() = password
+
+    override fun isAccountNonExpired() = true
+
+    override fun isAccountNonLocked() = true
+
+    fun checkAccess(customerId: Int): SecureUser {
+        if (role == Role.CUSTOMER && this.customerId != customerId)
+            throw IllegalAccessException("You have access only to yours resources")
+        return this
+    }
 }

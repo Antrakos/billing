@@ -42,11 +42,12 @@ CREATE TABLE "bills" (
 OIDS = FALSE
 );
 CREATE TABLE "users" (
-  "id"       SERIAL  NOT NULL,
-  "username" TEXT    NOT NULL,
-  "password" TEXT    NOT NULL,
-  "role"     TEXT    NOT NULL,
-  "enabled"  BOOLEAN NOT NULL,
+  "id"          SERIAL  NOT NULL,
+  "username"    TEXT    NOT NULL,
+  "password"    TEXT    NOT NULL,
+  "role"        TEXT    NOT NULL,
+  "enabled"     BOOLEAN NOT NULL,
+  "customer_id" INTEGER,
   CONSTRAINT users_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS = FALSE
@@ -60,4 +61,6 @@ ALTER TABLE "service_usages"
   ADD CONSTRAINT "service_usages_fk0" FOREIGN KEY ("customer_service_id") REFERENCES "customers_services_mapping" ("id");
 ALTER TABLE "bills"
   ADD CONSTRAINT "bills_fk0" FOREIGN KEY ("customer_service_id") REFERENCES "customers_services_mapping" ("id");
+ALTER TABLE "users"
+  ADD CONSTRAINT "users_fk0" FOREIGN KEY ("customer_id") REFERENCES "customers" ("id");
 

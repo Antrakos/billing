@@ -3,6 +3,7 @@ package com.antrakos.billing.service
 import com.antrakos.billing.models.*
 import com.antrakos.billing.repository.CustomerToServiceMappingRepository
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
@@ -36,13 +37,17 @@ interface CustomerService {
     fun stopService(customer: Customer, service: Service, lastUsage: Usage)
 }
 
+interface UserService : UserDetailsService {
+    fun create(user: User):  User
+}
+
 @Component
 open class BillGenerator(
         private val customerToServiceMappingRepository: CustomerToServiceMappingRepository,
         private val customerService: CustomerService,
         private val serviceService: ServiceService,
         private val billService: BillService) {
-    @Scheduled(cron = "0 0 1 * *")
+    @Scheduled(cron = "0 30 0 1 * *")
     fun generateBills() {
         customerToServiceMappingRepository.findActive().forEach {
             billService.createBill(customerService.find(it.customerId), serviceService.find(it.serviceId))
