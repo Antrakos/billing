@@ -3,10 +3,8 @@ package com.antrakos.billing.web
 import com.antrakos.billing.models.*
 import com.antrakos.billing.service.*
 import org.springframework.http.HttpStatus
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
-import javax.annotation.security.PermitAll
 
 /**
  * @author Taras Zubrei
@@ -55,6 +53,33 @@ open class CustomerController(
                     UsageDTO(
                             id = it.id!!,
                             value = it.value,
+                            date = it.date
+                    )
+                }
+    }
+
+    @GetMapping("{id}/bill")
+    fun findBills(@PathVariable("id") id: Int, @AuthenticationPrincipal user: SecureUser) = user.checkAccess(id).let {
+        billService.find(customerService.find(id))
+                .map {
+                    BillDTO(
+                            id = it.id!!,
+                            amount = it.amount,
+                            paid = it.paid,
+                            service = it.service,
+                            date = it.date
+                    )
+                }
+    }
+
+    @GetMapping("{id}/service/{serviceId}/bill")
+    fun findBills(@PathVariable("id") id: Int, @PathVariable("serviceId") serviceId: Int, @AuthenticationPrincipal user: SecureUser) = user.checkAccess(id).let {
+        billService.find(customerService.find(id), serviceService.find(serviceId))
+                .map {
+                    BillDTO(
+                            id = it.id!!,
+                            amount = it.amount,
+                            paid = it.paid,
                             date = it.date
                     )
                 }

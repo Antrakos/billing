@@ -30,6 +30,6 @@ data class BillDTO(
         val id: Int,
         val date: LocalDate,
         val amount: Double,
-        val service: Service,
+        val service: Service? = null,
         val paid: Boolean = false
 )

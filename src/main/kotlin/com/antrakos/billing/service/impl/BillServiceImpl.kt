@@ -17,9 +17,9 @@ open class BillServiceImpl(
         private val usageService: UsageService,
         private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) : BillService {
 
-    override fun find(customer: Customer): List<Bill> {
-        return customerToServiceMappingRepository.findServices(customer.id!!).flatMap { repository.find(it.id!!, customer.id) }
-    }
+    override fun find(customer: Customer, service: Service) = repository.find(service.id!!, customer.id!!)
+
+    override fun find(customer: Customer) = customerToServiceMappingRepository.findServices(customer.id!!).flatMap { repository.find(it.id!!, customer.id) }
 
     override fun lastBillDate(customer: Customer, service: Service) =
             repository.findLast(service.id!!, customer.id!!)?.date

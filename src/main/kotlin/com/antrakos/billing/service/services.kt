@@ -13,6 +13,7 @@ import java.time.LocalDate
 interface BillService {
     fun lastBillDate(customer: Customer, service: Service): LocalDate?
     fun find(customer: Customer): List<Bill>
+    fun find(customer: Customer, service: Service): List<Bill>
     fun createBill(customer: Customer, service: Service): List<Bill>
 }
 
