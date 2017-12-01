@@ -1,9 +1,6 @@
 package com.antrakos.billing.service.impl
 
-import com.antrakos.billing.models.Customer
-import com.antrakos.billing.models.CustomerToServiceMapping
-import com.antrakos.billing.models.Service
-import com.antrakos.billing.models.Usage
+import com.antrakos.billing.models.*
 import com.antrakos.billing.repository.CustomerRepository
 import com.antrakos.billing.repository.CustomerToServiceMappingRepository
 import com.antrakos.billing.service.BillService
@@ -39,5 +36,5 @@ open class CustomerServiceImpl(
 
     override fun create(customer: Customer) = repository.save(customer)
 
-    override fun find(id: Int) = repository.findById(id) ?: throw IllegalStateException("No customer found for id=$id")
+    override fun find(id: Int) = repository.findById(id) ?: throw ResourceNotFoundException("No customer found for id=$id")
 }

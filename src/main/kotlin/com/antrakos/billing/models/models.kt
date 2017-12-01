@@ -1,5 +1,7 @@
 package com.antrakos.billing.models
 
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ResponseStatus
 import java.time.LocalDate
 
 /**
@@ -13,7 +15,7 @@ enum class Role {
     WORKER, CUSTOMER
 }
 
-data class User (
+data class User(
         override val id: Int? = null,
         val username: String,
         val password: String,
@@ -62,3 +64,6 @@ data class CustomerToServiceMapping(
 
 
 data class UsageReport(val lastPaid: Usage? = null, val indexes: List<Usage>)
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class ResourceNotFoundException(message: String) : RuntimeException(message)
