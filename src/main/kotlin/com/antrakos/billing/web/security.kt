@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -81,7 +82,7 @@ class SecureUser(val id: Int, private val username: String, private val password
 
     fun checkAccess(customerId: Int): SecureUser {
         if (role == Role.CUSTOMER && this.customerId != customerId)
-            throw IllegalAccessException("You have access only to yours resources")
+            throw AccessDeniedException("You have access only to yours resources")
         return this
     }
 }
