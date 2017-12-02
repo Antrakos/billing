@@ -21,14 +21,14 @@ open class CustomerServiceImpl(
 
     override fun addService(customer: Customer, service: Service) {
         if (customerToServiceMappingRepository.exists(serviceId = service.id!!, customerId = customer.id!!) != null)
-            throw IllegalStateException("Customer[id=${customer.id}] has already activated service[id=${service.id}]")
+            throw BusinessLogicException("Customer[id=${customer.id}] has already activated service[id=${service.id}]")
         customerToServiceMappingRepository.save(CustomerToServiceMapping(serviceId = service.id, customerId = customer.id))
     }
 
     override fun stopService(customer: Customer, service: Service, lastUsage: Usage) {
         val mapping = customerToServiceMappingRepository.find(service.id!!, customer.id!!)
         if (!mapping.active)
-            throw IllegalStateException("Customer[id=${customer.id}] has already stopped service[id=${service.id}]")
+            throw BusinessLogicException("Customer[id=${customer.id}] has already stopped service[id=${service.id}]")
         usageService.create(lastUsage)
         billService.createBill(customer, service)
         customerToServiceMappingRepository.save(mapping.copy(active = false))

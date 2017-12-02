@@ -1,9 +1,6 @@
 package com.antrakos.billing.service.impl
 
-import com.antrakos.billing.models.Customer
-import com.antrakos.billing.models.Service
-import com.antrakos.billing.models.Usage
-import com.antrakos.billing.models.UsageReport
+import com.antrakos.billing.models.*
 import com.antrakos.billing.repository.CustomerToServiceMappingRepository
 import com.antrakos.billing.repository.UsageRepository
 import com.antrakos.billing.service.UsageService
@@ -24,7 +21,7 @@ open class UsageServiceImpl(private val repository: UsageRepository, private val
     override fun create(usage: Usage): Usage {
         val mapping = customerToServiceMappingRepository.find(usage.service.id!!, usage.customer.id!!)
         if (!mapping.active)
-            throw IllegalStateException("Can't add usage for stopped service")
+            throw BusinessLogicException("Can't add usage for stopped service")
         return repository.save(usage)
     }
 }

@@ -1,5 +1,6 @@
 package com.antrakos.billing.service.impl
 
+import com.antrakos.billing.models.ResourceNotFoundException
 import com.antrakos.billing.models.Service
 import com.antrakos.billing.repository.ServiceRepository
 import com.antrakos.billing.service.ServiceService
@@ -9,7 +10,7 @@ import com.antrakos.billing.service.ServiceService
  */
 @org.springframework.stereotype.Service
 open class ServiceServiceImpl(private val repository: ServiceRepository) : ServiceService {
-    override fun find(id: Int) = repository.findById(id) ?: throw IllegalStateException("No service found for id=$id")
+    override fun find(id: Int) = repository.findById(id) ?: throw ResourceNotFoundException("No service found for id=$id")
 
     override fun create(service: Service) = repository.save(service)
 

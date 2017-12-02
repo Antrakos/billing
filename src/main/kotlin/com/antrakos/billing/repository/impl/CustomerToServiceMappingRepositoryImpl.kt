@@ -1,6 +1,7 @@
 package com.antrakos.billing.repository.impl
 
 import com.antrakos.billing.models.CustomerToServiceMapping
+import com.antrakos.billing.models.ResourceNotFoundException
 import com.antrakos.billing.repository.AbstractRepository
 import com.antrakos.billing.repository.CustomerRepository
 import com.antrakos.billing.repository.CustomerToServiceMappingRepository
@@ -24,7 +25,7 @@ open class CustomerToServiceMappingRepositoryImpl(jdbcTemplate: JdbcTemplate, pr
     override fun find(serviceId: Int, customerId: Int) = try {
         jdbcTemplate.queryForObject("SELECT * FROM $tableName WHERE service_id=? AND customer_id=?", serviceId, customerId) { rs, _ -> fromResultSet(rs) }!!
     } catch (ex: EmptyResultDataAccessException) {
-        throw IllegalStateException("Customer[id=$customerId] doesn't have service[id=$serviceId]")
+        throw ResourceNotFoundException("Customer[id=$customerId] doesn't have service[id=$serviceId]")
     }
 
     override fun findServices(customerId: Int) =

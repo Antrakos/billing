@@ -67,3 +67,6 @@ data class UsageReport(val lastPaid: Usage? = null, val indexes: List<Usage>)
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 class ResourceNotFoundException(message: String) : RuntimeException(message)
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+class BusinessLogicException(message: String) : RuntimeException(message)
