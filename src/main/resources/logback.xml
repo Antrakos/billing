@@ -27,6 +27,9 @@
         </triggeringPolicy>
 
     </appender>
+    <logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG"/>
+    <logger name="org.springframework.jdbc.core.simple.SimpleJdbcInsert" level="DEBUG"/>
+    <logger name="org.springframework.jdbc.core.StatementCreatorUtils" level="TRACE"/>
 
     <root level="INFO">
         <appender-ref ref="FILE"/>
