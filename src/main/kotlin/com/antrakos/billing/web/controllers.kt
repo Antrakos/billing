@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.bind.annotation.*
 
 /**
@@ -30,7 +31,12 @@ open class CustomerController(
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     fun create(@RequestBody customerRequest: CustomerRequest): CustomerDTO {
-        val customer = customerService.create(Customer())
+        try {
+            userService.loadUserByUsername(customerRequest.username)
+            throw BusinessLogicException("Username (${customerRequest.username}) is not unique")
+        } catch (ex: UsernameNotFoundException) {
+        }
+        val customer = customerService.create(Customer(name = customerRequest.name, address = customerRequest.address))
         userService.create(customerRequest.let {
             User(
                     username = it.username,
@@ -137,6 +143,8 @@ open class CustomerController(
     private fun map(entity: Customer) = CustomerDTO(
             id = entity.id!!,
             balance = entity.balance,
+            name = entity.name,
+            address = entity.address,
             services = customerService.findServices(entity),
             unpaidBills = billService.find(entity).map { BillDTO(id = it.id!!, paid = it.paid, amount = it.amount, date = it.date, service = it.service) }
     )
@@ -194,4 +202,17 @@ open class UsageController(
                     service = serviceService.find(usage.serviceId)
             )
     )
+}
+
+@RestController
+@RequestMapping("/bill/")
+@Api(tags = ["Bill"])
+open class BillController(private val billService: BillService) {
+
+    @PutMapping("{id}")
+    @ApiOperation(
+            value = "Mark bill as paid",
+            notes = "Mark bill as paid in system"
+    )
+    fun markPaid(@PathVariable("id") id: Int) = billService.markPaid(billService.findOne(id))
 }

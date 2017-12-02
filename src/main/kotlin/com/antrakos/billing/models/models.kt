@@ -26,7 +26,9 @@ data class User(
 
 data class Customer(
         override val id: Int? = null,
-        val balance: Double = 0.0
+        val balance: Double = 0.0,
+        val name: String,
+        val address: String
 ) : BaseEntity
 
 data class Service(

@@ -35,6 +35,7 @@ open class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers(HttpMethod.POST, "/service/").hasRole(Role.WORKER.name)
                 .antMatchers(HttpMethod.DELETE, "/service/**").hasRole(Role.WORKER.name)
                 .antMatchers(HttpMethod.POST, "/usage/").hasRole(Role.WORKER.name)
+                .antMatchers(HttpMethod.PUT, "/bill/").hasRole(Role.WORKER.name)
                 .anyRequest().authenticated()
                 .and().httpBasic()
                 .authenticationEntryPoint { _, response, authException ->

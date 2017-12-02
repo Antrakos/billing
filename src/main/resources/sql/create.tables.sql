@@ -1,17 +1,15 @@
 CREATE TABLE "customers" (
-  "id"      SERIAL NOT NULL,
-  "balance" FLOAT  NOT NULL,
+  "id"      SERIAL       NOT NULL,
+  "balance" FLOAT        NOT NULL,
+  "name"    VARCHAR(255) NOT NULL,
+  "address" VARCHAR(255) NOT NULL,
   CONSTRAINT customers_pk PRIMARY KEY ("id")
-) WITH (
-OIDS = FALSE
 );
 CREATE TABLE "services" (
   "id"      SERIAL  NOT NULL,
   "price"   FLOAT   NOT NULL,
   "enabled" BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT services_pk PRIMARY KEY ("id")
-) WITH (
-OIDS = FALSE
 );
 CREATE TABLE "customers_services_mapping" (
   "id"          SERIAL  NOT NULL,
@@ -19,8 +17,6 @@ CREATE TABLE "customers_services_mapping" (
   "service_id"  INTEGER NOT NULL,
   "active"      BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT customers_services_mapping_pk PRIMARY KEY ("id")
-) WITH (
-OIDS = FALSE
 );
 CREATE TABLE "service_usages" (
   "id"                  SERIAL  NOT NULL,
@@ -28,8 +24,6 @@ CREATE TABLE "service_usages" (
   "date"                DATE    NOT NULL,
   "value"               FLOAT   NOT NULL,
   CONSTRAINT service_usages_pk PRIMARY KEY ("id")
-) WITH (
-OIDS = FALSE
 );
 CREATE TABLE "bills" (
   "id"                  SERIAL  NOT NULL,
@@ -38,19 +32,15 @@ CREATE TABLE "bills" (
   "customer_service_id" INTEGER NOT NULL,
   "paid"                BOOLEAN NOT NULL DEFAULT FALSE,
   CONSTRAINT bills_pk PRIMARY KEY ("id")
-) WITH (
-OIDS = FALSE
 );
 CREATE TABLE "users" (
   "id"          SERIAL  NOT NULL,
-  "username"    TEXT    NOT NULL,
+  "username"    TEXT    NOT NULL UNIQUE,
   "password"    TEXT    NOT NULL,
   "role"        TEXT    NOT NULL,
   "enabled"     BOOLEAN NOT NULL,
   "customer_id" INTEGER,
   CONSTRAINT users_pk PRIMARY KEY ("id")
-) WITH (
-OIDS = FALSE
 );
 
 ALTER TABLE "customers_services_mapping"

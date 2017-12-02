@@ -10,7 +10,9 @@ import java.time.LocalDate
 @ApiModel("customer", description = "Represents details about existing customer", subTypes = [Service::class, BillDTO::class])
 data class CustomerDTO(
         val id: Int,
+        val name: String,
         val balance: Double = 0.0,
+        val address: String,
         val services: List<Service>,
         val unpaidBills: List<BillDTO>
 )
@@ -18,7 +20,9 @@ data class CustomerDTO(
 @ApiModel("new customer", description = "Describes new customer that will be added to system")
 data class CustomerRequest(
         val username: String,
-        val password: String
+        val password: String,
+        val name: String,
+        val address: String
 )
 
 @ApiModel("usage", description = "Contains details about customer service usage")

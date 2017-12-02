@@ -2,6 +2,7 @@ package com.antrakos.billing.service.impl
 
 import com.antrakos.billing.models.Bill
 import com.antrakos.billing.models.Customer
+import com.antrakos.billing.models.ResourceNotFoundException
 import com.antrakos.billing.models.Service
 import com.antrakos.billing.repository.BillRepository
 import com.antrakos.billing.repository.CustomerToServiceMappingRepository
@@ -17,12 +18,18 @@ open class BillServiceImpl(
         private val usageService: UsageService,
         private val customerToServiceMappingRepository: CustomerToServiceMappingRepository) : BillService {
 
+    override fun findOne(id: Int) = repository.findById(id) ?: throw ResourceNotFoundException("No bill was found by id=$id")
+
     override fun find(customer: Customer, service: Service) = repository.find(service.id!!, customer.id!!)
 
     override fun find(customer: Customer) = customerToServiceMappingRepository.findServices(customer.id!!).flatMap { repository.find(it.id!!, customer.id) }
 
     override fun lastBillDate(customer: Customer, service: Service) =
             repository.findLast(service.id!!, customer.id!!)?.date
+
+    override fun markPaid(bill: Bill) {
+        repository.save(bill.copy(paid = true))
+    }
 
     override fun createBill(customer: Customer, service: Service): List<Bill> {
         val (lastPaid, usages) = usageService.getUsageReport(customer, service, lastBillDate(customer, service))
