@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="main-change-log">
+    <!--Tables-->
+    <changeSet author="antrakos" id="1513363956528-7">
+        <createTable tableName="bills">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="bills_pk"/>
+            </column>
+            <column name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_service_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="false" name="paid" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-8">
+        <createTable tableName="customers">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="customers_pk"/>
+            </column>
+            <column name="balance" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-9">
+        <createTable tableName="customers_services_mapping">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="customers_services_mapping_pk"/>
+            </column>
+            <column name="customer_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="service_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="true" name="active" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-10">
+        <createTable tableName="service_usages">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="service_usages_pk"/>
+            </column>
+            <column name="customer_service_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-11">
+        <createTable tableName="services">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="services_pk"/>
+            </column>
+            <column name="price" type="FLOAT8">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueBoolean="true" name="enabled" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-12">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="users_pk"/>
+            </column>
+            <column name="username" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="customer_id" type="INT"/>
+        </createTable>
+    </changeSet>
+    <!--Foreign keys-->
+    <changeSet author="antrakos" id="1513363956528-13">
+        <addUniqueConstraint columnNames="username" constraintName="users_username_key" tableName="users"/>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-14">
+        <addForeignKeyConstraint baseColumnNames="customer_service_id" baseTableName="bills" constraintName="bills_fk0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="customers_services_mapping"/>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-15">
+        <addForeignKeyConstraint baseColumnNames="customer_id" baseTableName="customers_services_mapping" constraintName="customers_services_mapping_fk0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="customers"/>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-16">
+        <addForeignKeyConstraint baseColumnNames="service_id" baseTableName="customers_services_mapping" constraintName="customers_services_mapping_fk1" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="services"/>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-17">
+        <addForeignKeyConstraint baseColumnNames="customer_service_id" baseTableName="service_usages" constraintName="service_usages_fk0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="customers_services_mapping"/>
+    </changeSet>
+    <changeSet author="antrakos" id="1513363956528-18">
+        <addForeignKeyConstraint baseColumnNames="customer_id" baseTableName="users" constraintName="users_fk0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="customers"/>
+    </changeSet>
+
+</databaseChangeLog>

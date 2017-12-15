@@ -13,6 +13,8 @@ buildscript {
         classpath 'org.springframework:springloaded:1.2.6.RELEASE'
         classpath 'io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'org.liquibase:liquibase-gradle-plugin:1.2.0'
+        classpath 'org.postgresql:postgresql:42.1.4'
     }
 }
 
@@ -20,6 +22,7 @@ apply plugin: 'kotlin'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: "io.spring.dependency-management"
+apply plugin: 'liquibase'
 
 group 'com.antrakos'
 version '1.0-SNAPSHOT'
@@ -44,6 +47,7 @@ dependencies {
     compile 'org.postgresql:postgresql'
     compile "io.springfox:springfox-swagger2:$springfox_version"
     compile "io.springfox:springfox-swagger-ui:$springfox_version"
+    compile 'org.liquibase:liquibase-core:3.4.1'
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-jdbc"
     compile 'org.springframework.boot:spring-boot-starter-security'
@@ -59,4 +63,16 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+
+liquibase {
+    activities {
+        postgres {
+            changeLogFile 'src/main/resources/liquibase-changeLog.xml'
+            url 'jdbc:postgresql://localhost:5432/billing'
+            username 'postgres'
+            password 'postgres'
+        }
+    }
+    runList = 'postgres'
 }
