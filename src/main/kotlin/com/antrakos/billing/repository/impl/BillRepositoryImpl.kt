@@ -40,7 +40,7 @@ open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRe
     private fun fromResultSet(resultSet: ResultSet, serviceId: Int, customerId: Int): Bill {
         return Bill(
                 id = resultSet.getInt("id"),
-                date = resultSet.getDate("date").toLocalDate(),
+                date = resultSet.getDate("billing_date").toLocalDate(),
                 amount = resultSet.getDouble("amount"),
                 paid = resultSet.getBoolean("paid"),
                 customer = customerRepository.findById(customerId)!!,
@@ -51,7 +51,7 @@ open class BillRepositoryImpl(jdbcTemplate: JdbcTemplate, private val customerRe
     override fun toFields(entity: Bill): Map<String, Any> {
         val id = customerToServiceMappingRepository.exists(entity.service.id!!, entity.customer.id!!) ?: customerToServiceMappingRepository.save(CustomerToServiceMapping(customerId = entity.customer.id, serviceId = entity.service.id)).id!!
         return mapOf(
-                "date" to Date.valueOf(entity.date),
+                "billing_date" to Date.valueOf(entity.date),
                 "amount" to entity.amount,
                 "paid" to entity.paid,
                 "customer_service_id" to id

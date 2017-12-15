@@ -47,7 +47,7 @@ dependencies {
     compile 'org.postgresql:postgresql'
     compile "io.springfox:springfox-swagger2:$springfox_version"
     compile "io.springfox:springfox-swagger-ui:$springfox_version"
-    compile 'org.liquibase:liquibase-core:3.4.1'
+    compile 'org.liquibase:liquibase-core:3.3.0'
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-jdbc"
     compile 'org.springframework.boot:spring-boot-starter-security'
@@ -56,6 +56,7 @@ dependencies {
     }
     testCompile "org.junit.jupiter:junit-jupiter-api"
     testRuntime "org.junit.jupiter:junit-jupiter-engine"
+    testCompile 'org.hsqldb:hsqldb'
 }
 
 compileKotlin {

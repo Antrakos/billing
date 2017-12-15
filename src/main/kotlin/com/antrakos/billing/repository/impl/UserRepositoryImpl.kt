@@ -25,7 +25,7 @@ open class UserRepositoryImpl(jdbcTemplate: JdbcTemplate) : AbstractRepository<U
             id = resultSet.getInt("id"),
             username = resultSet.getString("username"),
             password = resultSet.getString("password"),
-            role = Role.valueOf(resultSet.getString("role")),
+            role = Role.valueOf(resultSet.getString("access_role")),
             enabled = resultSet.getBoolean("enabled"),
             customerId = resultSet.getObject("customer_id", Integer::class.java)?.toInt()
     )
@@ -33,7 +33,7 @@ open class UserRepositoryImpl(jdbcTemplate: JdbcTemplate) : AbstractRepository<U
     override fun toFields(entity: User) = mutableMapOf(
             "username" to entity.username,
             "password" to entity.password,
-            "role" to entity.role.name,
+            "access_role" to entity.role.name,
             "enabled" to entity.enabled
     ).apply { if (entity.customerId != null) put("customer_id", entity.customerId) }
 }

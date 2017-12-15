@@ -9,16 +9,16 @@
             <column autoIncrement="true" name="id" type="SERIAL">
                 <constraints primaryKey="true" primaryKeyName="bills_pk"/>
             </column>
-            <column name="date" type="date">
+            <column name="billing_date" type="date">
                 <constraints nullable="false"/>
             </column>
-            <column name="amount" type="FLOAT8">
+            <column name="amount" type="FLOAT">
                 <constraints nullable="false"/>
             </column>
             <column name="customer_service_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueBoolean="false" name="paid" type="BOOL">
+            <column defaultValueBoolean="false" name="paid" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -28,7 +28,7 @@
             <column autoIncrement="true" name="id" type="SERIAL">
                 <constraints primaryKey="true" primaryKeyName="customers_pk"/>
             </column>
-            <column name="balance" type="FLOAT8">
+            <column name="balance" type="FLOAT">
                 <constraints nullable="false"/>
             </column>
             <column name="name" type="VARCHAR(255)">
@@ -50,7 +50,7 @@
             <column name="service_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueBoolean="true" name="active" type="BOOL">
+            <column defaultValueBoolean="true" name="active" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -63,10 +63,10 @@
             <column name="customer_service_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="date" type="date">
+            <column name="usage_date" type="date">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="FLOAT8">
+            <column name="usage_value" type="FLOAT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -76,10 +76,10 @@
             <column autoIncrement="true" name="id" type="SERIAL">
                 <constraints primaryKey="true" primaryKeyName="services_pk"/>
             </column>
-            <column name="price" type="FLOAT8">
+            <column name="price" type="FLOAT">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValueBoolean="true" name="enabled" type="BOOL">
+            <column defaultValueBoolean="true" name="enabled" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -89,16 +89,16 @@
             <column autoIncrement="true" name="id" type="SERIAL">
                 <constraints primaryKey="true" primaryKeyName="users_pk"/>
             </column>
-            <column name="username" type="TEXT">
+            <column name="username" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="TEXT">
+            <column name="password" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="role" type="TEXT">
+            <column name="access_role" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="enabled" type="BOOL">
+            <column name="enabled" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="customer_id" type="INT"/>
@@ -122,6 +122,14 @@
     </changeSet>
     <changeSet author="antrakos" id="1513363956528-18">
         <addForeignKeyConstraint baseColumnNames="customer_id" baseTableName="users" constraintName="users_fk0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="customers"/>
+    </changeSet>
+    <changeSet id="insert_admin_user" author="antrakos">
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="password" value="$2a$10$3IpZdLh0o/WcU0VxIc7ZN.8ddEGG4iikvGD7bjckyolu/TrlXJiWS"/>
+            <column name="access_role" value="WORKER"/>
+            <column name="enabled" value="TRUE"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>
