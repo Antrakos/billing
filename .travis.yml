@@ -10,7 +10,7 @@ before_install:
 script:
   - ./gradlew assemble
   - ./gradlew check
-  - ./gradlew codeCoverageReport
+  - ./gradlew test codeCoverageReport
   - ./gradlew jacocoTestReport
 
 after_success:
