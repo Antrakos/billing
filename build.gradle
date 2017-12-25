@@ -74,8 +74,8 @@ liquibase {
         postgres {
             changeLogFile 'src/main/resources/liquibase-changeLog.xml'
             url 'jdbc:postgresql://localhost:5432/billing'
-            username 'postgres'
-            password 'postgres'
+            username this.properties['datasource.username']
+            password this.properties['datasource.password']
         }
     }
     runList = 'postgres'
